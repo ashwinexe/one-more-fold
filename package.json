@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check fold-playback.js"
+    "check": "node --check server.mjs && node --check fold-playback.js && node --check hero-screens.js && node --check voice-halo.js && node --check apple-main.js"
   },
   "engines": { "node": ">=20" }
 }
