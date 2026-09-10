@@ -20,7 +20,9 @@ http.createServer(async (req, res) => {
           ? "application/javascript"
           : name.endsWith(".png")
             ? "image/png"
-            : name.endsWith(".wav") ? "audio/wav" : "text/html";
+            : name.endsWith(".wav") ? "audio/wav"
+              : name.endsWith(".webp") ? "image/webp"
+                : name.endsWith(".json") ? "application/json" : "text/html";
         res.writeHead(200, { "Content-Type": type });
         res.end(body);
         return;

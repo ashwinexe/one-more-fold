@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Hero animation check</title>
+<style>body{margin:0;background:#111;display:flex;gap:20px;align-items:start}canvas{max-width:60vw;height:auto}</style>
+<audio src="/keynote-intro.wav" controls></audio>
+<script type="module">
+import './hero-screens.js';
+const ready = setInterval(() => {
+  if (!window.__voiceDesignScreens) return;
+  clearInterval(ready);
+  document.body.append(...Object.values(window.__voiceDesignScreens));
+  setInterval(() => {
+    document.body.dataset.checksums = JSON.stringify(Object.values(window.__voiceDesignScreens).map(canvas => {
+      const bytes = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+      return bytes.reduce((sum, value, i) => (sum + value * (i % 97 + 1)) % 2147483647, 0);
+    }));
+  }, 1000);
+}, 100);
+</script></html>
