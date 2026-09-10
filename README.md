@@ -2,6 +2,8 @@
 
 Gradium Voice Design, folded into an iPhone Duo demo.
 
+![Gradium Voice Design displayed on a partially unfolded iPhone Duo](assets/demo-preview.png)
+
 ```bash
 node server.mjs
 ```
