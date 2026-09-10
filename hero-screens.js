@@ -1,4 +1,4 @@
-import { buildHalo, createHaloAnimator, splitAtCurve, PROFILE_HALO_CONFIG, HALO_INSET } from './voice-halo.js';
+import { buildHalo, createHaloAnimator, PROFILE_HALO_CONFIG, HALO_INSET } from './voice-halo.js';
 
 const loadImage = src => new Promise((resolve, reject) => {
   const image = new Image();
@@ -45,24 +45,44 @@ async function init() {
   figureContext.fillStyle = fade;
   figureContext.fillRect(0, 0, bust.width, bust.height);
   const back = canvas(size), front = canvas(size);
-  const [behind, ahead] = splitAtCurve(0.12, 0.58);
+  // Keep the upper arc behind the head; the lower arc crosses the torso.
+  // Split by projected height so moving particles keep the same occlusion.
+  const behind = (_particle, projected, geo) => projected.y < geo.pixels * 0.55;
+  const ahead = (particle, projected, geo) => !behind(particle, projected, geo);
   // One geometry and clock keep the complementary layers together.
   const geometry = buildHalo(1337, size * HALO_INSET, {
-    ...PROFILE_HALO_CONFIG, palette: ['#ffb592', '#d28c77'],
+    ...PROFILE_HALO_CONFIG, palette: ['#d77c50', '#a95737'],
+    compositeOperation: 'source-over', glowCap: 0.15,
   });
   const animator = createHaloAnimator({
     geometry, targets: [{ canvas: back, filter: behind }, { canvas: front, filter: ahead }],
-    state: 'waiting', manual: true, pauseOffscreen: false, reducedMotion: false,
+    state: 'waiting', speed: 0.2, manual: true, pauseOffscreen: false, reducedMotion: false,
   });
   const layouts = {
-    inner: { image: open, clear: [300, 90, 180, 230], sample: 290, figure: [329, 126, 120, 163], halo: [279, 83, 220, 220] },
-    outer: { image: closed, clear: [155, 88, 171, 220], sample: 145, figure: [181, 113, 119, 162], halo: [130, 72, 220, 220] },
+    inner: { image: open, clear: [300, 90, 180, 230], sample: 290, figure: [329, 126, 120, 163], halo: [279, 103, 220, 200] },
+    outer: { image: closed, clear: [155, 88, 171, 220], sample: 145, figure: [181, 113, 119, 162], halo: [130, 92, 220, 200] },
   };
   const screens = {};
   for (const [key, layout] of Object.entries(layouts)) {
     const base = canvas(layout.image.width, layout.image.height);
     const ctx = base.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(layout.image, 0, 0);
+    // Flatten the captured near-black gradient to one neutral background.
+    // The phone shader quantizes that gradient into visible horizontal bands.
+    // Ease out through shadow tones so statue edges and text stay intact.
+    const background = ctx.getImageData(0, 0, base.width, base.height);
+    const rgba = background.data;
+    for (let i = 0; i < rgba.length; i += 4) {
+      const high = Math.max(rgba[i], rgba[i + 1], rgba[i + 2]);
+      const low = Math.min(rgba[i], rgba[i + 1], rgba[i + 2]);
+      if (high >= 52 || high - low > 16) continue;
+      const t = Math.max(0, Math.min(1, (high - 28) / 24));
+      const amount = 1 - t * t * (3 - 2 * t);
+      for (let channel = 0; channel < 3; channel++) {
+        rgba[i + channel] = Math.round(rgba[i + channel] + (16 - rgba[i + channel]) * amount);
+      }
+    }
+    ctx.putImageData(background, 0, 0);
     // Replace the captured figure and frozen halo with the same background
     // gradient sampled alongside them. Keep all website text and neighbours.
     const [x, y, width, height] = layout.clear;

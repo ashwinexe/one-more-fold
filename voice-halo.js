@@ -397,7 +397,9 @@ export function buildHalo(seed, pixels, overrides = {}, options = {}) {
 		cy,
 		pixels,
 		palette,
-		rgb: palette.map(parseRgb)
+		rgb: palette.map(parseRgb),
+		compositeOperation: config.compositeOperation,
+		glowCap: config.glowCap
 	};
 }
 
@@ -584,7 +586,7 @@ function tintsFor(geo, surface) {
 	const target = 255;
 	const built = source.map(([r, g, b]) =>
 		Array.from({ length: GLOW_STEPS + 1 }, (_, i) => {
-			const m = (i / GLOW_STEPS) * GLOW_CAP[surface];
+			const m = (i / GLOW_STEPS) * (geo.glowCap ?? GLOW_CAP[surface]);
 			const mix = (c) => Math.round(c + (target - c) * m);
 			return `rgb(${mix(r)},${mix(g)},${mix(b)})`;
 		})
@@ -619,7 +621,7 @@ export function paintHalo(ctx, geo, frame = RESTING_FRAME, surface = 'dark', fil
 	ctx.scale(frame.punch, frame.punch);
 	ctx.translate(offset - size / 2, offset - size / 2);
 
-	ctx.globalCompositeOperation = surface === 'dark' ? 'lighter' : 'source-over';
+	ctx.globalCompositeOperation = geo.compositeOperation ?? (surface === 'dark' ? 'lighter' : 'source-over');
 	ctx.globalAlpha = clamp01(frame.opacity) * (surface === 'dark' ? 1 : LIGHT_INK_ALPHA);
 	const dotScale = surface === 'dark' ? 1 : LIGHT_DOT_SCALE;
 
