@@ -9,7 +9,7 @@ document.body.append(narration);
 const play = document.createElement('button');
 play.type = 'button';
 play.disabled = true;
-play.style.cssText = 'position:absolute;right:-44px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:0;border-radius:50%;background:#f0eeec;color:#be6957;cursor:pointer;font-size:14px;transition:background .2s,box-shadow .2s';
+play.style.cssText = 'position:absolute;right:-44px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:0;border-radius:50%;background:#1c1d20;color:#f5f5f5;cursor:pointer;font-size:14px;transition:background .2s,box-shadow .2s';
 controls.append(play);
 
 let scene = null;
@@ -28,8 +28,8 @@ function updateButton() {
   play.textContent = playing ? 'Ⅱ' : '▶';
   play.setAttribute('aria-label', playing ? 'Pause narration' : 'Play keynote line');
   play.title = playing ? 'Pause (Space)' : 'Play keynote line (Space)';
-  play.style.background = playing ? '#f4e2d9' : '#f0eeec';
-  play.style.boxShadow = playing ? '0 0 0 5px #be695714' : 'none';
+  play.style.background = playing ? '#36383d' : '#1c1d20';
+  play.style.boxShadow = playing ? '0 0 0 5px #11111120' : 'none';
 }
 ['play', 'pause', 'ended', 'error'].forEach(event => narration.addEventListener(event, updateButton));
 updateButton();
