@@ -1,5 +1,6 @@
 const slider = document.getElementById('fold-control');
 const controls = document.getElementById('fold-controls');
+const ground = document.getElementById('floating-ground');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const narration = new Audio('/keynote-intro.wav');
 narration.preload = 'auto';
@@ -107,6 +108,7 @@ const ready = setInterval(() => {
   scene = window.__duoScene;
   automated = !reducedMotion.matches && request === 0;
   controls.style.opacity = '1';
+  ground.style.opacity = '1';
   play.disabled = false;
   requestAnimationFrame(loop);
 }, 100);
@@ -121,6 +123,7 @@ function loop(time) {
   } else if (!scrubbing) {
     slider.value = Math.max(0, Math.min(1, scene.hinge.position));
   }
+  ground.style.setProperty('--shadow-width', `${28 + 16 * Math.max(0, Math.min(1, scene.hinge.position))}vw`);
   document.body.dataset.sceneState = JSON.stringify({ position: scene.hinge.position, active: scene.hinge.sliderIsActive, automated, scrubbing });
   requestAnimationFrame(loop);
 }
