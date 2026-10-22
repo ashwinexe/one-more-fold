@@ -16,7 +16,7 @@ http.createServer(async (req, res) => {
     if (!name.includes("..")) {
       try {
         const body = await fs.readFile(path.join(root, name));
-        const type = name.endsWith(".js")
+        const type = name.endsWith(".svg") ? "image/svg+xml" : name.endsWith(".js")
           ? "application/javascript"
           : name.endsWith(".png")
             ? "image/png"
@@ -57,5 +57,5 @@ http.createServer(async (req, res) => {
     res.end();
   }
 }).listen(port, "127.0.0.1", () => {
-  console.log(`Voice Design Duo preview: http://127.0.0.1:${port}`);
+  console.log(`Phonon Duo preview: http://127.0.0.1:${port}`);
 });

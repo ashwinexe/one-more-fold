@@ -2,10 +2,6 @@ const slider = document.getElementById('fold-control');
 const controls = document.getElementById('fold-controls');
 const ground = document.getElementById('floating-ground');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const narration = new Audio('/keynote-intro.wav');
-narration.preload = 'auto';
-narration.hidden = true;
-document.body.append(narration);
 
 const play = document.createElement('button');
 play.type = 'button';
@@ -18,27 +14,21 @@ let start = null;
 let automated = false;
 let scrubbing = false;
 let request = 0;
-let clips = ['/keynote-intro.wav'];
-let lastClip = null;
-fetch('/keynote-clips.json').then(response => response.json()).then(available => {
-  if (Array.isArray(available) && available.length) clips = available;
-}).catch(() => {});
-
 function updateButton() {
-  const playing = !narration.paused && !narration.ended;
+  const playing = automated;
   play.textContent = playing ? 'Ⅱ' : '▶';
-  play.setAttribute('aria-label', playing ? 'Pause narration' : 'Play keynote line');
-  play.title = playing ? 'Pause (Space)' : 'Play keynote line (Space)';
+  play.setAttribute('aria-label', playing ? 'Pause fold animation' : 'Replay fold animation');
+  play.title = playing ? 'Pause (Space)' : 'Replay fold animation (Space)';
   play.style.background = playing ? '#36383d' : '#1c1d20';
   play.style.boxShadow = playing ? '0 0 0 5px #11111120' : 'none';
 }
-['play', 'pause', 'ended', 'error'].forEach(event => narration.addEventListener(event, updateButton));
 updateButton();
 
 function stopMotion() {
   request++;
   automated = false;
   scene?.onSliderInactive();
+  updateButton();
 }
 
 function setFold(value) {
@@ -48,29 +38,15 @@ function setFold(value) {
   slider.value = value;
 }
 
-async function togglePlayback() {
+function togglePlayback() {
   if (!scene) return;
-  if (!narration.paused) {
-    narration.pause();
-    stopMotion();
-    return;
-  }
+  const wasPlaying = automated;
   stopMotion();
-  const current = request;
-  const choices = clips.filter(clip => clip !== lastClip);
-  const pool = choices.length ? choices : clips;
-  const selected = pool[Math.floor(Math.random() * pool.length)];
-  narration.src = selected;
-  narration.currentTime = 0;
-  try {
-    await narration.play();
-    lastClip = selected;
-    if (current !== request) return;
+  if (!wasPlaying) {
     start = performance.now();
-    automated = !reducedMotion.matches;
-  } catch {
+    // An explicit replay also works when automatic motion is reduced.
+    automated = true;
     updateButton();
-    play.title = 'Audio could not play. Click to retry';
   }
 }
 play.addEventListener('click', togglePlayback);
@@ -107,6 +83,7 @@ const ready = setInterval(() => {
   clearInterval(ready);
   scene = window.__duoScene;
   automated = !reducedMotion.matches && request === 0;
+  updateButton();
   controls.style.opacity = '1';
   ground.style.opacity = '1';
   play.disabled = false;
