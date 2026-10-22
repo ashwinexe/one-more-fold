@@ -12,6 +12,9 @@ http.createServer(async (req, res) => {
     const pathname = new URL(req.url, "http://localhost").pathname;
     let name = pathname === "/" ? "exact.html" : pathname.slice(1);
     if (pathname.endsWith("/overview/main.built.js")) name = "apple-main.js";
+    if (pathname.startsWith('/vendor/phonon-tts/')) {
+      name = 'node_modules/phonon-tts/' + pathname.slice('/vendor/phonon-tts/'.length);
+    }
 
     if (!name.includes("..")) {
       try {
@@ -22,7 +25,9 @@ http.createServer(async (req, res) => {
             ? "image/png"
             : name.endsWith(".wav") ? "audio/wav"
               : name.endsWith(".webp") ? "image/webp"
-                : name.endsWith(".json") ? "application/json" : "text/html";
+                : name.endsWith(".json") ? "application/json"
+                  : name.endsWith(".wasm") ? "application/wasm"
+                    : name.endsWith(".safetensors") ? "application/octet-stream" : "text/html";
         res.writeHead(200, { "Content-Type": type });
         res.end(body);
         return;
