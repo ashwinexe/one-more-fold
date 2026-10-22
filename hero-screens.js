@@ -20,10 +20,6 @@ async function init() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, width, height);
     ctx.drawImage(logo, 54, 64, 214, 47);
-    ctx.font = '22px monospace';
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#aaa';
-    ctx.fillText(narrow ? '☰' : 'Products     Pricing     Blog     Resources', width - 54, 96);
 
     // Crop each hand separately, leaving the centre clear for the wordmark.
     const handWidth = narrow ? 405 : 440;
@@ -58,6 +54,16 @@ async function init() {
     screens[key] = screen;
   }
   window.__phononScreens = screens;
-  window.__phononInvalidate?.();
+  // The viewer can repaint its wallpaper when a screen becomes visible.
+  // Keep our composition present through fold transitions and pose changes.
+  let last = 0;
+  function refresh(time) {
+    if (!document.hidden && time - last >= 1000 / 30) {
+      window.__phononInvalidate?.();
+      last = time;
+    }
+    requestAnimationFrame(refresh);
+  }
+  requestAnimationFrame(refresh);
 }
 init().catch(error => console.error('Phonon screens could not load.', error));
