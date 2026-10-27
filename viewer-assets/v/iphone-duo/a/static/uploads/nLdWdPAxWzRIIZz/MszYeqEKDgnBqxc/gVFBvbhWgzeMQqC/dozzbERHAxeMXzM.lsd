@@ -1,0 +1,1 @@
+{"intro":{"camera_360:InteractiveCamera":{"rotationY":[{"start":0,"end":0.00001,"startValue":0,"endValue":0,"easeFunction":[0.3333,0,0.6666,1]}]}},"hint":{"camera_360:InteractiveCamera":{"rotationY":[{"start":0,"end":0.0001,"startValue":0,"endValue":0,"easeFunction":[0.3333,0,0.6666,1]}]}}}

@@ -5,3 +5,4 @@ const files = ['exact.html','apple-main.js','fold-playback.js','phonon-speech.js
 for (const file of files) await fs.copyFile(file, 'public/' + file);
 await fs.cp('assets', 'public/assets', { recursive: true });
 await fs.cp('node_modules/phonon-tts', 'public/vendor/phonon-tts', { recursive: true });
+await fs.cp('viewer-assets', 'public', { recursive: true });

@@ -15,9 +15,9 @@ The phone opens and closes once silently. Press Space or Play to hear a keynote-
 
 Phonon 31m downloads from Hugging Face on first play and caches its model in the browser. Speech runs locally in a worker, with no API key or speech server. It uses “One More Fold,” our selected Gradium Voice Design voice, bundled in `assets/keynote-voice.safetensors`. The first play can take a while; loading progress appears above the controls. Use a browser with WebAssembly SIMD over HTTPS or localhost. Integration follows the [official browser guide](https://github.com/gradium-ai/xn-ptts/tree/main/ptts-wasm/js).
 
-This is a recording prototype, not an official Apple product page. Both displays show compositions of the Phonon landing page using its original hands and wordmark. The pictured “Click to test” button is part of the screen artwork; use Play for speech. The phone viewer loads additional assets from Apple, so an internet connection is required.
+This is a recording prototype, not an official Apple product page. Both displays show compositions of the Phonon landing page using its original hands and wordmark. The pictured “Click to test” button is part of the screen artwork; use Play for speech. The phone viewer uses bundled assets. Neither the local server nor the deployment proxies Apple pages or missing files; unknown paths return 404.
 
-`hero-screens.js` draws the two screen textures. `/halo-preview.html` shows them at full size. Run `bun run check` and `bun run build` before opening a PR.
+`hero-screens.js` draws the two screen textures. `/halo-preview.html` shows them at full size. Run `bun run check`, `bun run test` and `bun run build` before opening a PR.
 
 The hands reproduce Michelangelo’s *Creazione di Adamo*, c. 1511, in the Sistine Chapel, Musei Vaticani. Artwork details are on the [Phonon page](https://gradium.ai/phonon).
 
