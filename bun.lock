@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "one-more-fold",
+      "dependencies": {
+        "phonon-tts": "0.4.1",
+      },
+    },
+  },
+  "packages": {
+    "phonon-tts": ["phonon-tts@0.4.1", "", {}, "sha512-1T/EBS5FcWjpZeVotTE0Pftgqqhr0D5IWHEa9TtH0EMbba5XpuTWo+hn0N29lb5b7Vi3Dpp+p/Sb/6z4Uf/1Cw=="],
+  }
+}

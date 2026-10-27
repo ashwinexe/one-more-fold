@@ -1,3 +1,5 @@
+import { createSpeech } from './phonon-speech.js';
+
 const slider = document.getElementById('fold-control');
 const controls = document.getElementById('fold-controls');
 const ground = document.getElementById('floating-ground');
@@ -8,6 +10,19 @@ play.type = 'button';
 play.disabled = true;
 play.style.cssText = 'position:absolute;right:-44px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:0;border-radius:50%;background:#1c1d20;color:#f5f5f5;cursor:pointer;font-size:14px;transition:background .2s,box-shadow .2s';
 controls.append(play);
+const status = document.createElement('div');
+status.setAttribute('role', 'status');
+status.style.cssText = 'position:absolute;bottom:34px;left:50%;transform:translateX(-50%);width:min(360px,85vw);text-align:center;font:12px/1.4 system-ui,sans-serif;color:#6e6e73;pointer-events:none';
+controls.append(status);
+const narration = createSpeech({
+  onStatus: text => { status.textContent = text; },
+  onStart: () => {
+    start = performance.now();
+    automated = !reducedMotion.matches;
+    updateButton();
+  },
+  onEnd: () => { stopMotion(); },
+});
 
 let scene = null;
 let start = null;
@@ -15,18 +30,20 @@ let automated = false;
 let scrubbing = false;
 let request = 0;
 function updateButton() {
-  const playing = automated;
+  const playing = narration.active;
   play.textContent = playing ? 'Ⅱ' : '▶';
-  play.setAttribute('aria-label', playing ? 'Pause fold animation' : 'Replay fold animation');
-  play.title = playing ? 'Pause (Space)' : 'Replay fold animation (Space)';
+  play.setAttribute('aria-label', playing ? 'Stop Phonon narration' : 'Play Phonon narration');
+  play.title = playing ? 'Stop (Space)' : 'Play Phonon narration (Space)';
+  play.setAttribute('aria-pressed', String(playing));
   play.style.background = playing ? '#36383d' : '#1c1d20';
   play.style.boxShadow = playing ? '0 0 0 5px #11111120' : 'none';
 }
 updateButton();
 
-function stopMotion() {
+function stopMotion(stopSpeech = true) {
   request++;
   automated = false;
+  if (stopSpeech) narration.stop();
   scene?.onSliderInactive();
   updateButton();
 }
@@ -40,12 +57,10 @@ function setFold(value) {
 
 function togglePlayback() {
   if (!scene) return;
-  const wasPlaying = automated;
+  const wasPlaying = narration.active;
   stopMotion();
   if (!wasPlaying) {
-    start = performance.now();
-    // An explicit replay also works when automatic motion is reduced.
-    automated = true;
+    void narration.play();
     updateButton();
   }
 }
@@ -77,6 +92,7 @@ slider.addEventListener('change', releaseSlider);
 slider.addEventListener('blur', releaseSlider);
 document.addEventListener('pointerup', releaseSlider);
 document.addEventListener('pointercancel', releaseSlider);
+window.addEventListener('pagehide', () => stopMotion());
 
 const ready = setInterval(() => {
   if (!window.__duoScene?.hinge) return;
@@ -96,7 +112,7 @@ function loop(time) {
     const elapsed = time - start;
     let value = elapsed < 1800 ? 0 : elapsed < 6000 ? (elapsed - 1800) / 4200 : elapsed < 8600 ? 1 : elapsed < 12800 ? 1 - (elapsed - 8600) / 4200 : 0;
     setFold(value * value * (3 - 2 * value));
-    if (elapsed >= 14000) stopMotion();
+    if (elapsed >= 14000) stopMotion(false);
   } else if (!scrubbing) {
     slider.value = Math.max(0, Math.min(1, scene.hinge.position));
   }

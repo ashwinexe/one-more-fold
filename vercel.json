@@ -9,19 +9,11 @@
       "dest": "/exact.html"
     },
     {
-      "src": "/v/iphone-duo/a/built/scripts/overview/main.built.js",
-      "dest": "/apple-main.js"
-    },
-    {
-      "src": "/(metrics|api-www)(.*)",
-      "status": 204
-    },
-    {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "https://www.apple.com/$1"
+      "status": 404
     }
   ]
 }
